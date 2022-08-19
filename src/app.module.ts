@@ -13,7 +13,6 @@ import { UserModule } from './user/user.module';
       username: 'root',
       password: '',
       database: 'pelatihan_nestjs',
-      entities: [],
       autoLoadEntities: true,
       synchronize: true, // set to False if in Productrion Mode
     }),
