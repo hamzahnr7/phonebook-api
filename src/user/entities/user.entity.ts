@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { InternalServerErrorException } from '@nestjs/common';
+import { hash } from 'bcrypt';
+import { Exclude } from 'class-transformer';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -14,9 +17,21 @@ export class User {
   @Column({ type: String, length: 12 })
   username: string;
 
-  @Column({ type: String, length: 12 })
+  @Exclude()
+  @Column()
   password: string;
 
   @Column({ type: String, length: 12 })
-  telphone: string;
+  phonenumber?: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    try {
+      this.password = await hash(this.password, 10);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'There are some issue before inserting',
+      );
+    }
+  }
 }

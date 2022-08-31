@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from 'bcrypt';
 import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,8 +15,10 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  registerUser(createUserDto: CreateUserDto) {
-    return this.userRepository.save({ ...createUserDto });
+  async registerUser(createUserDto: CreateUserDto) {
+    const userDto = await this.userRepository.create({ ...createUserDto }); // Create will automatically run @BeforeInsert decorator
+    const { password, ...userData } = await this.userRepository.save(userDto);
+    return userData;
   }
 
   getAllUser() {
