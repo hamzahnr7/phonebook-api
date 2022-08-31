@@ -19,10 +19,11 @@ export class AuthenticationService {
     const userData = await this.userRepository.findOne({ where: { email } });
     if (userData) {
       const confirmPassword = await compare(password, userData.password);
-      if (!confirmPassword) throw new UnauthorizedException();
+      if (!confirmPassword)
+        throw new UnauthorizedException('Wrong email and password');
       const userToken = this.jwtService.sign({ ...userData });
       return { userToken };
     }
-    throw new UnauthorizedException();
+    throw new UnauthorizedException('Wrong email and password');
   }
 }
