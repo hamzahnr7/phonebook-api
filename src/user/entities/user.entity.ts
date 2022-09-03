@@ -1,31 +1,40 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { hash } from 'bcrypt';
-import { Exclude } from 'class-transformer';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import * as typeorm from 'typeorm';
 
-@Entity()
+@typeorm.Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @typeorm.PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: String, length: 30 })
+  @typeorm.Column({ type: String, length: 30 })
   name: string;
 
-  @Column({ type: String })
+  @typeorm.Column({ type: String })
   email: string;
 
-  @Column({ type: String, length: 12 })
+  @typeorm.Column({ type: String, length: 12 })
   username: string;
 
-  @Exclude()
-  @Column()
+  @typeorm.Column()
   password: string;
 
-  @Column({ type: String, length: 12 })
+  @typeorm.Column({ type: String, length: 12 })
   phonenumber?: string;
 
-  @BeforeInsert()
-  async hashPassword() {
+  @typeorm.BeforeUpdate()
+  async hashBeforeUpdate() {
+    try {
+      this.password = await hash(this.password, 10);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'There are some issue before inserting',
+      );
+    }
+  }
+
+  @typeorm.BeforeInsert()
+  async hashBeforeInsert() {
     try {
       this.password = await hash(this.password, 10);
     } catch (error) {

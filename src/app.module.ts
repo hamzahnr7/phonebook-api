@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     }),
     UserModule,
     AuthenticationModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],
