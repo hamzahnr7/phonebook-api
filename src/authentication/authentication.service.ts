@@ -1,29 +1,33 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
-import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
-import { CreateAuthenticationDto } from './dto/user-authentication.dto';
+import { UserService } from 'src/user/user.service';
+import { CreateAuthDto } from './dto/user-authentication.dto';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async userLogin(createAuthenticationDto: CreateAuthenticationDto) {
-    const { email, password } = createAuthenticationDto;
-    const userData = await this.userRepository.findOne({ where: { email } });
-    if (userData) {
-      const confirmPassword = await compare(password, userData.password);
-      if (!confirmPassword)
-        throw new UnauthorizedException('Wrong email and password');
-      const userToken = this.jwtService.sign({ ...userData });
-      return { userToken };
+  async validateUser(createAuthDto: CreateAuthDto) {
+    const userData = await this.userService.getUserByEmail(createAuthDto.email);
+    const confirmPassword = await compare(
+      createAuthDto.password,
+      userData.password,
+    );
+    if (userData && confirmPassword) {
+      const { password, ...result } = userData;
+      return { ...result };
     }
-    throw new UnauthorizedException('Wrong email and password');
+    return null;
+  }
+
+  async login(user: any) {
+    const payload = { ...user };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

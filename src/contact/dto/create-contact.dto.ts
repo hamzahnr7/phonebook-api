@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateContactDto {
   @IsString()
@@ -8,9 +8,8 @@ export class CreateContactDto {
   name: string;
 
   @IsString()
-  @IsOptional()
-  address?: string;
+  address: string;
 
   @IsString()
-  description: Text;
+  description: string;
 }

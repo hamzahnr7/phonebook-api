@@ -1,6 +1,8 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { hash } from 'bcrypt';
+import { Contact } from 'src/contact/entities/contact.entity';
 import * as typeorm from 'typeorm';
+import { OneToMany } from 'typeorm';
 
 @typeorm.Entity()
 export class User {
@@ -21,6 +23,9 @@ export class User {
 
   @typeorm.Column({ type: String, length: 12 })
   phonenumber?: string;
+
+  @OneToMany(() => Contact, (contact) => contact.user)
+  contacs: Contact[];
 
   @typeorm.BeforeUpdate()
   async hashBeforeUpdate() {
